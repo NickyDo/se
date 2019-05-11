@@ -1,3 +1,4 @@
+const request = require('superagent');
 var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: "localhost",
@@ -15,16 +16,54 @@ connection.connect((err) => {
 
 
 module.exports = function (app, passport) {
-    app.get('/', function (req, res) {
+    let device;
+    app.get('/', async function (req, res, next) {
+        await request
+            .get('http://192.168.1.4:1880/ESP')
+            .then((r) => {
+                res.body = r.body;
+                console.log("res.body", r.body);
+                let data = {
+                    analog: r.body.analog,
+                    prob: r.body.prob
+                };
+
+                connection.query("SELECT * FROM devices WHERE device = ?", [r.body.device], (err, rows) => {
+                    if (!err) {
+                        console.log("data", rows);
+                        device = rows
+                    } else {
+                        console.log(err)
+                    }
+                });
+
+                // console.log("aaa", device)
+                // connection.query("UPDATE datas set ? WHERE device = ? ", [data, "A"], function (err, rows) {
+                //
+                //     if (err) {
+                //         console.log("sss",err);
+                //         return next("Mysql error, check your query");
+                //     }else {
+                //         console.log("vvv")
+                //     }
+                //
+                //     // res.sendStatus(200);
+                //
+                // });
+
+            })
+            .catch(err => {
+                console.log(err);
+            });
         res.render('index.ejs');
     });
 
-    app.get('/login', function (req, res) {
+    app.get('/login', checkLoginForLoginPage, function (req, res) {
         res.render('login.ejs', {message: req.flash('loginMessage')});
     });
 
-    app.get('/employees', isLoggedIn, function (req, res) {
-        connection.query("SELECT * FROM datas", (err, rows) => {
+    app.get('/devices', isLoggedIn, function (req, res) {
+        connection.query("SELECT * FROM devices", (err, rows) => {
             if (!err) {
                 // res.send(rows)
                 res.render('user.ejs', {title: "RESTful Crud Example", data: rows});
@@ -35,8 +74,8 @@ module.exports = function (app, passport) {
         })
     });
 
-    app.get('/employees/:id', isLoggedIn, function (req, res) {
-        connection.query("SELECT * FROM datas WHERE id = ?", [req.params.id], (err, rows) => {
+    app.get('/devices/:id', isLoggedIn, function (req, res) {
+        connection.query("SELECT * FROM devices WHERE id = ?", [req.params.id], (err, rows) => {
             if (!err) {
                 res.send(rows)
             } else {
@@ -45,8 +84,8 @@ module.exports = function (app, passport) {
         })
     });
 
-    app.delete('/employees/:id', isLoggedIn, function (req, res) {
-        connection.query("DELETE * FROM datas WHERE id = ?", [req.params.id], (err, rows) => {
+    app.delete('/devices/:id', isLoggedIn, function (req, res) {
+        connection.query("DELETE * FROM devices WHERE id = ?", [req.params.id], (err, rows) => {
             if (!err) {
                 res.send("delete successfully")
             } else {
@@ -55,16 +94,7 @@ module.exports = function (app, passport) {
         })
     });
 
-    app.post('/employees', isLoggedIn, function (req, res) {
-        // connection.query("INSERT * FROM datas WHERE id = ?", [req.params.id], (err, rows) => {
-        //     if (!err) {
-        //         res.send("delete successfully")
-        //     } else {
-        //         console.log(err)
-        //     }
-        // })
-
-
+    app.post('/devices', isLoggedIn, function (req, res) {
         //get data
         var data = {
             device: req.body.device,
@@ -74,12 +104,7 @@ module.exports = function (app, passport) {
 
         console.log("Datas", data)
 
-        //inserting into mysql
-        // req.getConnection(function (err, conn){
-
-        // if (err) return next("Cannot Connect");
-
-        connection.query("INSERT INTO datas set ? ", data, function (err, rows) {
+        connection.query("INSERT INTO devices set ? ", data, function (err, rows) {
 
             if (err) {
                 console.log(err);
@@ -94,7 +119,7 @@ module.exports = function (app, passport) {
     });
 
     app.post('/login', passport.authenticate('local-login', {
-            successRedirect: '/profile',
+            successRedirect: '/dashboard',
             failureRedirect: '/login',
             failureFlash: true
         }),
@@ -112,16 +137,16 @@ module.exports = function (app, passport) {
     });
 
     app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect: '/profile',
+        successRedirect: '/dashboard',
         failureRedirect: '/signup',
         failureFlash: true
     }));
 
-    app.get('/profile', isLoggedIn, function (req, res) {
-        connection.query("SELECT * FROM datas", (err, rows) => {
+    app.get('/dashboard', isLoggedIn, function (req, res) {
+        connection.query("SELECT * FROM devices", (err, rows) => {
             if (!err) {
                 // res.send(rows)
-                res.render('profile.ejs', {title: "RESTful Crud Example", data: rows, user: req.user});
+                res.render('dashboard.ejs', {title: "RESTful Crud Example", data: rows, user: req.user});
 
             } else {
                 console.log(err)
@@ -134,6 +159,15 @@ module.exports = function (app, passport) {
         res.redirect('/');
     })
 };
+
+function checkLoginForLoginPage(req, res, next) {
+    console.log("req.isAuthenticated()", req.isAuthenticated())
+    if(req.isAuthenticated() === true){
+        res.redirect('/dashboard')
+    } else{
+        return next();
+    }
+}
 
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated())
