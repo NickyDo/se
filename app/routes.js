@@ -24,32 +24,38 @@ module.exports = function (app, passport) {
                 res.body = r.body;
                 console.log("res.body", r.body);
                 let data = {
+                    time:  r.body.time,
                     analog: r.body.analog,
                     prob: r.body.prob
                 };
 
+                // console.log(data)
+
                 connection.query("SELECT * FROM devices WHERE device = ?", [r.body.device], (err, rows) => {
                     if (!err) {
-                        console.log("data", rows);
-                        device = rows
+                        // console.log("datsa", rows[0].time);
+                        device = rows[0].device
+                        if(rows[0].device && rows[0].time !== r.body.time){
+                            connection.query("UPDATE devices set ? WHERE device = ? ", [data, r.body.device], function (err, rows) {
+                                console.log("aaa", r.body.device, data)
+
+                                if (err) {
+                                    console.log("sss",err);
+                                    return next("Mysql error, check your query");
+                                }else {
+                                    console.log("vvv")
+                                }
+
+                                // res.sendStatus(200);
+
+                            });
+                        }
                     } else {
                         console.log(err)
                     }
                 });
 
-                // console.log("aaa", device)
-                // connection.query("UPDATE datas set ? WHERE device = ? ", [data, "A"], function (err, rows) {
-                //
-                //     if (err) {
-                //         console.log("sss",err);
-                //         return next("Mysql error, check your query");
-                //     }else {
-                //         console.log("vvv")
-                //     }
-                //
-                //     // res.sendStatus(200);
-                //
-                // });
+
 
             })
             .catch(err => {
@@ -98,8 +104,8 @@ module.exports = function (app, passport) {
         //get data
         var data = {
             device: req.body.device,
-            status: req.body.status,
-            property: req.body.property
+            time: req.body.time,
+            prob: req.body.prob
         };
 
         console.log("Datas", data)
