@@ -43,15 +43,15 @@
                 <table cellpadding="11">
                     <tr>
                         <td style="color: black;" class="label">device</td>
-                        <td>: <input type="text" name="device"></td>
+                        <td>: <input value="1" type="text" name="device"></td>
                     </tr>
                     <tr>
                         <td style="color: black;" class="label">status</td>
-                        <td>: <input type="text" name="status"></td>
+                        <td>: <input  value="1" type="text" name="status"></td>
                     </tr>
                     <tr>
                         <td style="color: black;" class="label">property</td>
-                        <td>: <input type="text" name="property"></td>
+                        <td>: <input  value="1" type="text" name="property"></td>
                     </tr>
                     <tr>
                         <td class="label"></td>
@@ -75,6 +75,8 @@
                 <th>device name</th>
                 <th>analog</th>
                 <th>property</th>
+                <th>status</th>
+                <th>Date</th>
             </tr>
             </thead>
             <tbody>
@@ -87,6 +89,8 @@
                 <td><%= data[i].device %></td>
                 <td><%= data[i].analog %></td>
                 <td><%= data[i].prob %></td>
+                <td><%= data[i].status %></td>
+                <td><%= data[i].date %></td>
             </tr>
             <% }
 
@@ -102,6 +106,10 @@
 </div>
 <script>
 
+    setInterval(()=>{
+        window.location.reload();
+    }, 5000)
+
     function saveUser() {
 
         $.ajax({
@@ -109,6 +117,32 @@
             url: "/devices",
             type: "post",
             data: $("#the-form").serialize(),
+            success: function (res) {
+
+                window.location.reload();
+                return false;
+            },
+            error: function (xhr, status, error) {
+
+                console.log(xhr.responseText);
+                var err = '';
+                $.each(JSON.parse(xhr.responseText), function (i, item) {
+
+                    err += '<li>' + item.msg + '</li>';
+                });
+                $(".err-area").html(err);
+                return false;
+            }
+
+        });
+    }
+
+    function getData() {
+
+        $.ajax({
+
+            url: "/dashboard",
+            type: "post",
             success: function (res) {
 
                 window.location.reload();

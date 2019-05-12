@@ -23,8 +23,10 @@ CREATE TABLE IF NOT EXISTS `devices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `device` varchar(100) NOT NULL,
   `time` int (11) NOT NULL,
-  `analog` int(11) NOT NULL,
+  `analog` varchar(100) NOT NULL,
   `prob` varchar(100) NOT NULL,
+  `status` varchar(100) NOT NULL,
+  `date` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
@@ -32,5 +34,5 @@ CREATE TABLE IF NOT EXISTS `devices` (
 -- Dumping data for table `devices`
 --
 
-INSERT INTO `devices` (`id`, `device`, `time`, `analog`, prob) VALUES
-(1, 'ESP32', 56380, 2, 'REDLED-on,SERVO-off');
+INSERT INTO `devices` (`id`, `device`, `time`, `analog`, prob, status, `date`) VALUES
+(1, 'ESP32', 56380, '2', 'REDLED-on,SERVO-off', 'ON', "2019-5-12 11:12:40");
