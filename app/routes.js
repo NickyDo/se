@@ -14,125 +14,11 @@ connection.connect((err) => {
         console.log("DB connection failed \n Error" + JSON.stringify(err, undefined, 2))
 });
 
-var deviceName = ['WemosD1', 'ESP8266']
+var deviceName = ['WemosD1'];
+var duyDevice = [];
 
 module.exports = function (app, passport) {
     app.get('/', async function (req, res, next) {
-        await request
-            .get('http://192.168.1.4:1880/ESP')
-            .then((r) => {
-                res.body = r.body;
-                console.log("res.body", r.body);
-                let data = {
-                    device: r.body.device,
-                    time: r.body.time,
-                    analog: r.body.analog,
-                    prob: r.body.prob,
-                    status: "ON",
-                    date: getDate()
-                };
-
-                // console.log(data)
-
-                connection.query("SELECT * FROM devices WHERE device = ?", [r.body.device], (err, rows) => {
-                    if (!err) {
-                        console.log("datsa", rows[rows.length - 1]);
-                        if (rows[0] !== undefined) {
-                            if (rows[rows.length - 1].device === r.body.device && rows[rows.length - 1].time === r.body.time) {
-
-                            } else {
-                                connection.query("INSERT INTO devices set ? ", data, function (err, rows) {
-
-                                    if (err) {
-                                        console.log(err);
-                                        return next("Mysql error, check your query");
-                                    } else {
-                                        console.log("POST OK!")
-                                    }
-                                });
-                                checkStatusDevice()
-                            }
-                        } else {
-                            connection.query("INSERT INTO devices set ? ", data, function (err, rows) {
-
-                                if (err) {
-                                    console.log(err);
-                                    return next("Mysql error, check your query");
-                                } else {
-                                    console.log("POST OK!")
-                                }
-                            });
-                            checkStatusDevice()
-                        }
-                    } else {
-                        console.log(err)
-                    }
-                });
-
-
-            })
-            .catch(err => {
-                console.log(err);
-            });
-        setInterval(async ()=>{
-            await request
-                .get('http://192.168.1.4:1880/ESP')
-                .then((r) => {
-                    res.body = r.body;
-                    console.log("res.body", r.body);
-                    let data = {
-                        device: r.body.device,
-                        time: r.body.time,
-                        analog: r.body.analog,
-                        prob: r.body.prob,
-                        status: "ON",
-                        date: getDate()
-                    };
-
-                    // console.log(data)
-
-                    connection.query("SELECT * FROM devices WHERE device = ?", [r.body.device], (err, rows) => {
-                        if (!err) {
-                            if (rows[0] !== undefined) {
-                                if (rows[rows.length - 1].device === r.body.device && rows[rows.length - 1].time === r.body.time) {
-                                  console.log("everything is up to date")
-                                } else {
-                                    connection.query("INSERT INTO devices set ? ", data, function (err, rows) {
-
-                                        if (err) {
-                                            console.log(err);
-                                            return next("Mysql error, check your query");
-                                        } else {
-                                            console.log("POST OK!")
-                                        }
-                                    });
-                                }
-                            } else {
-                                connection.query("INSERT INTO devices set ? ", data, function (err, rows) {
-
-                                    if (err) {
-                                        console.log(err);
-                                        return next("Mysql error, check your query");
-                                    } else {
-                                        console.log("POST OK!")
-                                    }
-                                });
-                            }
-                        } else {
-                            console.log(err)
-                        }
-                    });
-
-
-                })
-                .catch(err => {
-                    console.log(err);
-                });
-            }, 5000)
-
-        setInterval(()=>{
-            checkStatusDevice()
-        }, 15000)
 
         res.render('index.ejs');
     });
@@ -163,8 +49,13 @@ module.exports = function (app, passport) {
         })
     });
 
-    app.delete('/devices/:id', isLoggedIn, function (req, res) {
-        connection.query("DELETE * FROM devices WHERE id = ?", [req.params.id], (err, rows) => {
+    app.delete('/devices/:device', isLoggedIn, function (req, res) {
+        // connection.query("SELECT * FROM devices WHERE device = ?", [req.body.username], (err, rows) => {
+        //
+        // })
+        console.log("delete", req.params.device)
+
+        connection.query("DELETE FROM devices WHERE device = ?", [req.params.device], (err, rows) => {
             if (!err) {
                 res.send("delete successfully")
             } else {
@@ -183,16 +74,16 @@ module.exports = function (app, passport) {
 
         console.log("Datas", data)
 
-        connection.query("INSERT INTO devices set ? ", data, function (err, rows) {
-
-            if (err) {
-                console.log(err);
-                return next("Mysql error, check your query");
-            }
-
-            res.sendStatus(200);
-
-        });
+        // connection.query("INSERT INTO devices set ? ", data, function (err, rows) {
+        //
+        //     if (err) {
+        //         console.log(err);
+        //         return next("Mysql error, check your query");
+        //     }
+        //
+        //     res.sendStatus(200);
+        //
+        // });
 
         // });
     });
@@ -225,70 +116,224 @@ module.exports = function (app, passport) {
         connection.query("SELECT * FROM devices", (err, rows) => {
             if (!err) {
                 // res.send(rows)
-                res.render('dashboard.ejs', {title: "RESTful Crud Example", data: rows, user: req.user});
+                console.log("aaaa", rows[rows.length - 1])
+                res.render('dashboard.ejs', {
+                    title: "RESTful Crud Example",
+                    data: rows,
+                    user: req.user
+                });
 
             } else {
                 console.log(err)
             }
         })
+
+
     });
 
-    app.post('/dashboard', isLoggedIn, function (req, res) {
-        connection.query("SELECT * FROM devices", (err, rows) => {
+    app.get('/detail', isLoggedIn, function (req, res) {
+        connection.query("SELECT * FROM devices WHERE user = ?", [req.user.username],(err, rows) => {
             if (!err) {
-                res.send(rows)
-                // res.response = rows
+                // res.send(rows)
+                console.log("aaaa", rows, req.user)
+                res.render('detail.ejs', {
+                    title: "detail",
+                    data: rows,
+                    user: req.user,
+                });
 
             } else {
                 console.log(err)
             }
         })
+
+
+    });
+
+
+    app.get('/item', isLoggedIn, function (req, res) {
+        console.log("duyDevice", duyDevice);
+        if(duyDevice.length > 0) {
+            for(let i = 0; i < duyDevice.length; i++){
+                connection.query("SELECT * FROM devices WHERE user = ?", [req.user.username],(err, rows) => {
+                    if (!err) {
+                        // res.send(rows)
+                        console.log("laaaa", rows.length)
+                        res.render('item.ejs', {
+                            title: "detail",
+                            data: rows[rows.length - 1],
+                            user: req.user,
+                        });
+
+                    } else {
+                        console.log(err)
+                    }
+                })
+            }
+
+        }
+
+
+
+    });
+
+    app.post('/dashboard', isLoggedIn, async function (req, res, next) {
+        let checkDevice = duyDevice.filter((item)=>{return item == req.body.device})
+        if(checkDevice == req.body.device){
+
+        }else{
+            duyDevice.push(req.body.device)
+
+        }
+        let defaultData = {
+            device: req.body.device,
+            time: '',
+            user: req.body.username,
+            voltage: '',
+            prob: '',
+            status: '',
+            date: getDate()
+        };
+
+        connection.query("SELECT * FROM devices WHERE device = ?", [req.body.device], (err, rowss) => {
+            console.log("rowss.length", rowss.length)
+            if(rowss.length < 1){
+                connection.query("INSERT INTO devices set ? ", defaultData, function (err, re) {
+
+                    if (err) {
+                        console.log(err);
+                        return next("Mysql error, check your query");
+                    } else {
+                        console.log("POST OK!");
+
+                    }
+                });
+
+            }
+
+            setTimeout(()=>{
+                setInterval(async () => {
+                    await request
+                        .get('http://192.168.1.4:1880/ESP')
+                        .then((r) => {
+                            console.log("res.body", r.body);
+                            let data = {
+                                device: r.body.device,
+                                time: r.body.time,
+                                user: r.body.user,
+                                voltage: r.body.voltage,
+                                prob: r.body.prob,
+                                status: "ON",
+                                date: getDate()
+                            };
+
+                            console.log('data', req.body.device, req.body.username, r.body.user, r.body.device)
+
+                                connection.query("SELECT * FROM devices WHERE device = ?", [r.body.device], (err, rows) => {
+                                    if (!err && rows[rows.length - 1] !== undefined  && rows[rows.length - 1].user == r.body.user) {
+                                        if (rows[rows.length - 1].device == r.body.device ) {
+                                           if(parseInt(rows[rows.length - 1].time) !== parseInt(r.body.time)){
+                                               console.log("trungtime", rows[rows.length - 1].time, r.body.time)
+                                               connection.query("INSERT INTO devices set ? ", data, function (err, re) {
+
+                                                   if (err) {
+                                                       console.log(err);
+                                                       return next("Mysql error, check your query");
+                                                   } else {
+                                                       console.log("POST OK!");
+                                                       setTimeout(() => {
+                                                           checkStatusDevice(r.body.device, r.body.user)
+                                                       }, 31000)
+                                                   }
+                                               });
+                                           } else{
+                                               console.log("everything is up to date")
+                                           }
+
+                                        } else {
+                                            connection.query("INSERT INTO devices set ? ", data, function (err, re) {
+
+                                                if (err) {
+                                                    console.log(err);
+                                                    return next("Mysql error, check your query");
+                                                } else {
+                                                    console.log("POST OK!");
+                                                    setTimeout(() => {
+                                                        checkStatusDevice(r.body.device, r.body.user)
+                                                    }, 31000)
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        console.log(err)
+                                    }
+                                });
+                            // }
+
+
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
+
+                }, 1000)
+
+            }, 5000)
+        })
+
+
+        res.send("OK")
     });
 
 
     app.get('/logout', function (req, res) {
         req.logout();
+        console.log("req.isAuthenticated()", req.isAuthenticated())
         res.redirect('/');
     })
 };
 
-function checkStatusDevice() {
- for(let i = 0; i < deviceName.length; i++){
-     connection.query("SELECT * FROM devices WHERE device = ?", [deviceName[i]], (err, rows) => {
-         if (!err) {
-             // res.send(rows)
-             console.log("dv",rows);
-             let ti1 = rows[rows.length - 1].time - rows[rows.length  - 2].time;
-             console.log("dvtime",ti1);
-             let tc1 = Date.parse(getDate())
-             let tc2 = Date.parse(rows[rows.length - 1].date)
-             console.log("t2", tc1, tc2 ,tc1-tc2)
-             if((tc1 - tc2)  > ti1){
-                     let offlineData = {
-                         device: deviceName[i],
-                         time: rows[rows.length - 1].time,
-                         analog: 'No Information',
-                         prob: 'No Information',
-                         status: "OFF",
-                         date: getDate()
-                     };
-                     console.log(rows[rows.length - 1].device + ":OFF");
-                     connection.query("INSERT INTO devices set ? ", offlineData, function (err, rows) {
+function checkStatusDevice(item, user) {
+        connection.query("SELECT * FROM devices WHERE device = ?", [item], (err, rows) => {
+            if (!err) {
+                // res.send(rows)
+                console.log("dv", rows);
+                if (rows.length >= 2) {
+                    let ti1 = parseInt(rows[rows.length - 1].time)  - parseInt(rows[rows.length - 2].time);
+                    console.log("dvtime", ti1);
+                    let tc1 = Date.parse(getDate());
+                    let tc2 = Date.parse(rows[rows.length - 1].date);
+                    console.log("t2", tc1, tc2, tc1 - tc2);
+                    if ((tc1 - tc2) > ti1 || (tc1 - tc2) === undefined) {
+                        let offlineData = {
+                            device: item,
+                            time: 'No Information',
+                            user: user,
+                            voltage: 'No Information',
+                            prob: 'No Information',
+                            status: "OFF",
+                            date: getDate()
+                        };
 
-                         if (err) {
-                             console.log(err);
-                             return next("Mysql error, check your query");
-                         } else {
-                             console.log("POST update status OK!")
-                         }
-                     });
-             }
+                        console.log(rows[rows.length - 1].device + ":OFF");
 
-         } else {
-             console.log(err)
-         }
-     })
- }
+                        connection.query("INSERT INTO devices set ? ", offlineData, function (err, rows, next) {
+
+                            if (err) {
+                                console.log(err);
+                                return next("Mysql error, check your query");
+                            } else {
+                                console.log("POST update status OK!")
+                            }
+                        });
+                    }
+                }
+
+            } else {
+                console.log(err)
+            }
+        })
+
 }
 
 function checkLoginForLoginPage(req, res, next) {

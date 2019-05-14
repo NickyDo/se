@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Data</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+
+    <style>
+        html {
+            padding: 50px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header text-center">
+        <h1>Monitoring data</h1>
+        <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+        <a href="/dashboard" class="btn btn-danger btn-sm">Back page</a>
+    </div>
+
+    <div id="content" class="table-responsive">
+        <table class="table table-bordered table-first-center table-hover">
+            <thead>
+            <tr>
+                <th scope="col">device name</th>
+                <th scope="col">voltage</th>
+                <th scope="col">property</th>
+                <th scope="col">status</th>
+                <th scope="col">Date</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><%= data.device %></td>
+                    <td><%= data.voltage %></td>
+                    <td><%= data.prob %></td>
+                    <td><%= data.status %></td>
+                    <td><%= data.date %></td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    setInterval(() => {
+        getdata();
+    }, 5000)
+
+    function getdata() {
+        $.ajax({
+
+            url: "/item",
+            type: "get",
+            success: function (res) {
+                console.log("res", res)
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+
+        });
+
+    }
+</script>

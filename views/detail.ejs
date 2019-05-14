@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Data</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+
+    <style>
+        html {
+            padding: 50px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header text-center">
+        <h1>Monitoring data</h1>
+        <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+        <a href="/dashboard" class="btn btn-danger btn-sm">Back page</a>
+    </div>
+
+    <div id="content" class="table-responsive">
+        <table class="table table-bordered table-first-center table-hover">
+            <thead>
+            <tr>
+                <th style="width: 50px;">No</th>
+                <th scope="col">device name</th>
+                <th scope="col">voltage</th>
+                <th scope="col">property</th>
+                <th scope="col">status</th>
+                <th scope="col">Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if(data.length){
+
+            for(var i = 0;i < data.length;i++) { %>
+
+                <tr>
+                    <td><%= (i + 1) %></td>
+                    <td><%= data[i].device %></td>
+                    <td><%= data[i].voltage %></td>
+                    <td><%= data[i].prob %></td>
+                    <td><%= data[i].status %></td>
+                    <td><%= data[i].date %></td>
+                </tr>
+            <% }
+
+            }else{ %>
+                <tr>
+                    <td colspan="5">No Data</td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    setInterval(()=>{
+        window.location.reload();
+    }, 5000)
+
+</script>

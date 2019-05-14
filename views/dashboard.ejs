@@ -16,133 +16,132 @@
             padding: 50px;
         }
 
+        input[type=text], select {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type=submit] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type=submit]:hover {
+            background-color: #45a049;
+        }
+
+
     </style>
 </head>
 <body>
 <div class="container">
     <div class="page-header text-center">
-        <h1>My Profile</h1>
+        <h1>Monitoring data</h1>
         <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+        <a href="/detail" class="btn btn-danger btn-sm">detail</a>
     </div>
 
     <div class="row">
         <div class="col-sm-12">
-            <div class="well">
-                <h3><span class="fa fa-user"></span> Welcome <%= user.username %></h3>
-
-                <p>
-                    <strong>id</strong> <%= user.id %> <br>
-                    <strong>username</strong> <%= user.username %> <br>
-                </p>
+            <div style="text-align: center; width: 30%; margin: 10px auto" class="well">
+                <h4><span class="fa fa-user"></span> Welcome <%= user.username %></h4>
             </div>
         </div>
+        <ol>
+            <li>
+                <div class="col-sm-12 formTable">
 
-        <div class="col-sm-12">
+                    <form method="post" action="" id="the-form">
+                        <lablel style="color: black; font-size: large" >Add Device Name</lablel>
+                        <input type="text" placeholder="device name" name="device">
+                        <div style="display: none">
+                            <label style="color: black;" class="label">name</label>
+                            <input value="<%= user.username %>" type="text" name="username">
+                        </div>
 
-            <form method="post" action="" id="the-form">
-                <table cellpadding="11">
-                    <tr>
-                        <td style="color: black;" class="label">device</td>
-                        <td>: <input value="1" type="text" name="device"></td>
-                    </tr>
-                    <tr>
-                        <td style="color: black;" class="label">status</td>
-                        <td>: <input  value="1" type="text" name="status"></td>
-                    </tr>
-                    <tr>
-                        <td style="color: black;" class="label">property</td>
-                        <td>: <input  value="1" type="text" name="property"></td>
-                    </tr>
-                    <tr>
-                        <td class="label"></td>
-                        <td>
-                            &nbsp; <input type="button" value="Save" onClick="saveUser()">
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-        <div class="col-sm-12">
-            <ul class="err-area"></ul>
-        </div>
+                        <input class="btn btn-danger btn-sm" type="submit" value="Submit" onClick="saveUser()">
+
+
+                    </form>
+
+                </div>
+            </li>
+            <li>
+                <div class="col-sm-12">
+                    <lablel style="color: black; font-size: large" >Delete Device Name</lablel>
+                    <input id="txt_name" placeholder="device name" type="text" name="device">
+                    <button class="btn btn-danger btn-sm" onClick="deleteDevice()">delete</button>
+
+                </div>
+            </li>
+        </ol>
+
+
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th>No</th>
-                <th>device name</th>
-                <th>analog</th>
-                <th>property</th>
-                <th>status</th>
-                <th>Date</th>
-            </tr>
-            </thead>
-            <tbody>
-            <% if(data.length){
-
-            for(var i = 0;i < data.length;i++) { %>
-
-            <tr>
-                <td><%= (i + 1) %></td>
-                <td><%= data[i].device %></td>
-                <td><%= data[i].analog %></td>
-                <td><%= data[i].prob %></td>
-                <td><%= data[i].status %></td>
-                <td><%= data[i].date %></td>
-            </tr>
-            <% }
-
-            }else{ %>
-                <tr>
-                    <td colspan="5">No Data</td>
-                </tr>
-            <% } %>
-            </tbody>
-        </table>
-    </div>
 
 </div>
 <script>
 
-    setInterval(()=>{
-        window.location.reload();
-    }, 5000)
+    // setInterval(()=>{
+    //     window.location.reload();
+    // }, 5000)
 
     function saveUser() {
-
-        $.ajax({
-
-            url: "/devices",
-            type: "post",
-            data: $("#the-form").serialize(),
-            success: function (res) {
-
-                window.location.reload();
-                return false;
-            },
-            error: function (xhr, status, error) {
-
-                console.log(xhr.responseText);
-                var err = '';
-                $.each(JSON.parse(xhr.responseText), function (i, item) {
-
-                    err += '<li>' + item.msg + '</li>';
-                });
-                $(".err-area").html(err);
-                return false;
-            }
-
-        });
-    }
-
-    function getData() {
-
+        // window.location.reload();
         $.ajax({
 
             url: "/dashboard",
             type: "post",
+            data: $("#the-form").serialize(),
+            success: function (res) {
+                console.log("res", res)
+
+                window.location.replace("http://localhost:8080/detail");
+
+                return false;
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+
+        });
+
+    }
+
+    function getdata() {
+        $.ajax({
+
+            url: "/dashboard",
+            type: "get",
+            success: function (res) {
+                console.log("res", res)
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+
+        });
+
+    }
+
+    function deleteDevice() {
+        var device = $('#txt_name').val();
+        $.ajax({
+            url: "/devices/" + device,
+            type: 'DELETE',
             success: function (res) {
 
                 window.location.reload();
@@ -151,15 +150,9 @@
             error: function (xhr, status, error) {
 
                 console.log(xhr.responseText);
-                var err = '';
-                $.each(JSON.parse(xhr.responseText), function (i, item) {
-
-                    err += '<li>' + item.msg + '</li>';
-                });
-                $(".err-area").html(err);
+                alert("Error deleting");
                 return false;
             }
-
         });
     }
 

@@ -21,18 +21,19 @@ SET time_zone = "+00:00";
 
 CREATE TABLE IF NOT EXISTS `devices` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `device` varchar(100) NOT NULL,
-  `time` int (11) NOT NULL,
-  `analog` varchar(100) NOT NULL,
-  `prob` varchar(100) NOT NULL,
-  `status` varchar(100) NOT NULL,
-  `date` varchar(100) NOT NULL,
+  `device` varchar(100),
+  `time` varchar(100),
+  `user` varchar(100),
+  `voltage` varchar(100),
+  `prob` varchar(100),
+  `status` varchar(100),
+  `date` varchar(100),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6;
 
 --
 -- Dumping data for table `devices`
 --
 
-INSERT INTO `devices` (`id`, `device`, `time`, `analog`, prob, status, `date`) VALUES
-(1, 'ESP32', 56380, '2', 'REDLED-on,SERVO-off', 'ON', "2019-5-12 11:12:40");
+-- INSERT INTO `devices` (`id`, `device`, `time`, `voltage`, prob, status, `date`) VALUES
+-- (1, 'ESP32', 56380, '2', 'REDLED-on,SERVO-off', 'ON', "2019-5-12 11:12:40");
