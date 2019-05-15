@@ -21,11 +21,11 @@
 <body>
 <div class="container">
     <div class="page-header text-center">
-        <h1>Monitoring data</h1>
+        <h1>Battery Monitoring System</h1>
         <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
-        <a href="/dashboard" class="btn btn-danger btn-sm">Back page</a>
     </div>
     <a onclick="getdata()" class="btn btn-danger btn-sm">refresh data</a>
+    <a href="/dashboard" class="btn btn-danger btn-sm">Add data</a>
     <div id="content" class="table-responsive">
         <table class="table table-bordered table-first-center table-hover">
             <thead>
@@ -65,9 +65,9 @@
 </div>
 
 <script>
-    // setInterval(() => {
-    //     getdata();
-    // }, 5000)
+    setInterval(() => {
+        getdata();
+    }, 5000)
 
     function getdata() {
         $.ajax({

@@ -84,7 +84,7 @@ module.exports = function (app, passport) {
     });
 
     app.post('/login', passport.authenticate('local-login', {
-            successRedirect: '/dashboard',
+            successRedirect: '/item',
             failureRedirect: '/login',
             failureFlash: true
         }),
@@ -102,7 +102,8 @@ module.exports = function (app, passport) {
     });
 
     app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect: '/dashboard',
+        // successRedirect: '/detail_device',
+        successRedirect: '/detail_device',
         failureRedirect: '/signup',
         failureFlash: true
     }));
@@ -112,7 +113,7 @@ module.exports = function (app, passport) {
             if (!err) {
                 // res.send(rows)
                 console.log("aaaa", rows[rows.length - 1])
-                res.render('dashboard.ejs', {
+                res.render('add_device.ejs', {
                     title: "RESTful Crud Example",
                     data: rows,
                     user: req.user
@@ -375,7 +376,7 @@ function checkStatusDevice(item, user) {
 function checkLoginForLoginPage(req, res, next) {
     console.log("req.isAuthenticated()", req.isAuthenticated())
     if (req.isAuthenticated() === true) {
-        res.redirect('/dashboard')
+        res.redirect('/item')
     } else {
         return next();
     }
