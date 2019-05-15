@@ -288,18 +288,18 @@ module.exports = function (app, passport) {
                                            }
 
                                         } else {
-                                            // connection.query("INSERT INTO devices set ? ", data, function (err, re) {
-                                            //
-                                            //     if (err) {
-                                            //         console.log(err);
-                                            //         return next("Mysql error, check your query");
-                                            //     } else {
-                                            //         console.log("POST OK!");
-                                            //         setTimeout(() => {
-                                            //             checkStatusDevice(r.body.device, r.body.user)
-                                            //         }, 31000)
-                                            //     }
-                                            // });
+                                            connection.query("INSERT INTO devices set ? ", data, function (err, re) {
+
+                                                if (err) {
+                                                    console.log(err);
+                                                    return next("Mysql error, check your query");
+                                                } else {
+                                                    console.log("POST OK!");
+                                                    setTimeout(() => {
+                                                        checkStatusDevice(r.body.device, r.body.user)
+                                                    }, 31000)
+                                                }
+                                            });
                                         }
                                     } else {
                                         console.log(err)
