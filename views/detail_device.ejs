@@ -25,12 +25,12 @@
         <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
         <a href="/dashboard" class="btn btn-danger btn-sm">Back page</a>
     </div>
-    <a onclick="getdata()" class="btn btn-danger btn-sm">refresh data</a>
+
     <div id="content" class="table-responsive">
         <table class="table table-bordered table-first-center table-hover">
             <thead>
             <tr>
-                <th scope="col">id</th>
+                <th style="width: 50px;">No</th>
                 <th scope="col">device name</th>
                 <th scope="col">voltage</th>
                 <th scope="col">property</th>
@@ -45,7 +45,7 @@
 
                 <tr>
                     <td><%= (i + 1) %></td>
-                    <td><input id="test<%=i%>" value="<%= data[i].device %>" onclick="logData(<%=i%>)" readonly/></td>
+                    <td><%= data[i].device %></td>
                     <td><%= data[i].voltage %></td>
                     <td><%= data[i].prob %></td>
                     <td><%= data[i].status %></td>
@@ -65,43 +65,8 @@
 </div>
 
 <script>
-    // setInterval(() => {
-    //     getdata();
-    // }, 5000)
+    setInterval(()=>{
+        window.location.reload();
+    }, 5000)
 
-    function getdata() {
-        $.ajax({
-
-            url: "/item",
-            type: "get",
-            success: function (res) {
-                console.log("res", res)
-                window.location.reload();
-            },
-            error: function (xhr, status, error) {
-                console.log(xhr.responseText);
-            }
-
-        });
-
-    }
-
-    function logData(i) {
-        console.log("aaa", $("#test" + i).val())
-        let data = {device: $("#test" + i).val()}
-        $.ajax({
-
-            url: "/log",
-            type: "post",
-            data: data,
-            success: function (res) {
-                console.log("res", res)
-                window.location.replace("http://localhost:8080/detail_device");
-            },
-            error: function (xhr, status, error) {
-                console.log(xhr.responseText);
-            }
-
-        });
-    }
 </script>

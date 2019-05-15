@@ -1,11 +1,16 @@
 const request = require('superagent');
 var mysql = require('mysql');
+const util = require('util');
+
+
 var connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "123",
-    database: "test"
+    database: "test",
+    multipleStatements: true
 });
+const query = util.promisify(connection.query).bind(connection);
 
 connection.connect((err) => {
     if (!err)
@@ -14,8 +19,10 @@ connection.connect((err) => {
         console.log("DB connection failed \n Error" + JSON.stringify(err, undefined, 2))
 });
 
-var deviceName = ['WemosD1'];
+
+// var deviceName = ['WemosD1'];
 var duyDevice = [];
+var detail_device = []
 
 module.exports = function (app, passport) {
     app.get('/', async function (req, res, next) {
@@ -74,18 +81,6 @@ module.exports = function (app, passport) {
 
         console.log("Datas", data)
 
-        // connection.query("INSERT INTO devices set ? ", data, function (err, rows) {
-        //
-        //     if (err) {
-        //         console.log(err);
-        //         return next("Mysql error, check your query");
-        //     }
-        //
-        //     res.sendStatus(200);
-        //
-        // });
-
-        // });
     });
 
     app.post('/login', passport.authenticate('local-login', {
@@ -150,31 +145,61 @@ module.exports = function (app, passport) {
 
     });
 
+    app.get('/detail_device', isLoggedIn, function (req, res) {
+        res.render('detail_device.ejs', {
+            title: "detail",
+            data: detail_device,
+            user: req.user,
+        });
+    });
 
-    app.get('/item', isLoggedIn, function (req, res) {
-        console.log("duyDevice", duyDevice);
-        if(duyDevice.length > 0) {
-            for(let i = 0; i < duyDevice.length; i++){
-                connection.query("SELECT * FROM devices WHERE user = ?", [req.user.username],(err, rows) => {
-                    if (!err) {
-                        // res.send(rows)
-                        console.log("laaaa", rows.length)
-                        res.render('item.ejs', {
-                            title: "detail",
-                            data: rows[rows.length - 1],
-                            user: req.user,
-                        });
 
-                    } else {
-                        console.log(err)
-                    }
-                })
+    app.post('/log', isLoggedIn, function (req, res) {
+        console.log("log",  req.body.device)
+        connection.query("SELECT * FROM devices WHERE user = ? AND device = ?", [req.user.username,  req.body.device],(err, rows) => {
+            if (!err) {
+                // res.send(rows)
+                console.log("aaaa", rows)
+                detail_device = rows
+
+            } else {
+                console.log(err)
             }
+        })
+        res.send("OK")
 
-        }
+    });
 
 
+    app.get('/item', isLoggedIn, async function (req, res) {
+        // console.log("req.body.username", currentUser)
+        connection.query("SELECT device FROM devices WHERE user = ? and status = ?", [req.user.username, ''],async (err, rows) => {
+            if (!err) {
+                // res.send(rows)
+                let rowsAll = []
 
+                try {
+                    for(let i = 0; i < rows.length; i ++ ){
+                        let us = rows[i].device
+                        let rows1 = await query('select * from devices where device = ?', [us]);
+                        rowsAll.push(rows1[rows1.length - 1])
+                    }
+                    // let rows2 = await query('select * from devices where device = "WemosD1"');
+                    console.log("items", rowsAll);
+                    res.render('item.ejs', {
+                        title: "detail",
+                        data: rowsAll,
+                        user: req.user,
+                    });
+                } finally {
+                    // connection.end();
+                }
+
+            } else {
+                console.log(err)
+            }
+        })
+        console.log("duyDevice", duyDevice);
     });
 
     app.post('/dashboard', isLoggedIn, async function (req, res, next) {
@@ -214,9 +239,20 @@ module.exports = function (app, passport) {
             setTimeout(()=>{
                 setInterval(async () => {
                     await request
+                        // .get('https://dog.ceo/api/breeds/list/all')
                         .get('http://192.168.1.4:1880/ESP')
                         .then((r) => {
                             console.log("res.body", r.body);
+                            r.body = {
+                                device: 'WemosD1',
+                                time: '50157293',
+                                user: '  duy',
+                                voltage: '493421',
+                                prob: 'Temp-27.20,Hum-72.00',
+                                status: "ON",
+                                date: getDate()
+                            };
+
                             let data = {
                                 device: r.body.device,
                                 time: r.body.time,
