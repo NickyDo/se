@@ -267,9 +267,11 @@ module.exports = function (app, passport) {
                 res.send("ALREADY")
             }
 
+            var data = {};
+
             setTimeout(() => {
-                setInterval(() => {
-                    request
+                setInterval(async () => {
+                   await request
                         .get('http://192.168.1.69:1880/ESP')
                         .then((r) => {
                             console.log("res.body", r.body);
@@ -282,8 +284,9 @@ module.exports = function (app, passport) {
                             //     status: "ON",
                             //     date: getDate()
                             // };
+                            data = []
 
-                            let data = {
+                            data = {
                                 device: r.body.device,
                                 time: r.body.time,
                                 user: r.body.user,
@@ -291,15 +294,14 @@ module.exports = function (app, passport) {
                                 prob: r.body.prob,
                                 status: "ON",
                                 date: getDate()
-                            };
+                            }
 
                             console.log('data', req.body.device, req.body.username, r.body.user, r.body.device)
 
                             connection.query("SELECT * FROM devices WHERE device = ?", [r.body.device], (err, rows) => {
                                 if (!err && rows[rows.length - 1] !== undefined && rows[rows.length - 1].user == r.body.user) {
                                     if (rows[rows.length - 1].device == r.body.device) {
-                                        if (parseInt(rows[rows.length - 1].time) !== parseInt(r.body.time)) {
-                                            console.log("trungtime", rows[rows.length - 1].time, r.body.time)
+                                        if (parseInt(rows[rows.length - 1].time) != parseInt(r.body.time)) {
                                             connection.query("INSERT INTO devices set ? ", data, function (err, re) {
 
                                                 if (err) {
