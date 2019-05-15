@@ -36,6 +36,7 @@
                 <th scope="col">property</th>
                 <th scope="col">status</th>
                 <th scope="col">Date</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -44,12 +45,13 @@
             for(var i = 0;i < data.length;i++) { %>
 
                 <tr>
-                    <td><%= (i + 1) %></td>
+                    <td><%= data[i].id %></td>
                     <td><%= data[i].device %></td>
                     <td><%= data[i].voltage %></td>
                     <td><%= data[i].prob %></td>
                     <td><%= data[i].status %></td>
                     <td><%= data[i].date %></td>
+                    <td><button id="del<%= data[i].id %>" class="btn btn-danger btn-sm" onclick="deleteData(<%= data[i].id %>)">Delete</button></td>
                 </tr>
             <% }
 
@@ -68,5 +70,22 @@
     setInterval(()=>{
         window.location.reload();
     }, 5000)
+
+
+    function deleteData(index) {
+        $.ajax({
+
+            url: "/delete_device/" + index,
+            type: 'DELETE',
+            success: function (res) {
+                console.log("res", res)
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+
+        });
+    }
 
 </script>

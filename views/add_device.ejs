@@ -72,21 +72,21 @@
                             <input value="<%= user.username %>" type="text" name="username">
                         </div>
 
-                        <input class="btn btn-danger btn-sm" type="submit" value="Submit" onClick="saveUser()">
+                        <input class="btn btn-danger btn-sm" type="submit" value="Add device" onClick="addDevice()">
 
 
                     </form>
 
                 </div>
             </li>
-            <li>
-                <div class="col-sm-12">
-                    <lablel style="color: black; font-size: large" >Delete Device Name</lablel>
-                    <input id="txt_name" placeholder="device name" type="text" name="device">
-                    <button class="btn btn-danger btn-sm" onClick="deleteDevice()">delete</button>
+<!--            <li>-->
+<!--                <div class="col-sm-12">-->
+<!--                    <label style="color: black; font-size: large" >Delete Device Name</label>-->
+<!--                    <input id="txt_name" placeholder="device name" type="text" name="device">-->
+<!--                    <button class="btn btn-danger btn-sm" onClick="deleteDevice()">delete</button>-->
 
-                </div>
-            </li>
+<!--                </div>-->
+<!--            </li>-->
         </ol>
 
 
@@ -100,7 +100,7 @@
     //     window.location.reload();
     // }, 5000)
 
-    function saveUser() {
+    function addDevice() {
         // window.location.reload();
         $.ajax({
 
@@ -109,8 +109,17 @@
             data: $("#the-form").serialize(),
             success: function (res) {
                 console.log("res", res)
-
-                window.location.replace("http://localhost:8080/item");
+                if(res === "OK"){
+                    window.location.replace("http://localhost:8080/item");
+                }else if(res === "ALREADY"){
+                    alert("The device is already added")
+                    window.location.reload();
+                }else if(res === "NOTHING"){
+                    alert("Type something please!")
+                    window.location.reload();
+                }else{
+                    console.log("None")
+                }
 
                 return false;
             },
