@@ -56,10 +56,7 @@ module.exports = function (app, passport) {
         })
     });
 
-    app.delete('/devices/:device', isLoggedIn, function (req, res) {
-        // connection.query("SELECT * FROM devices WHERE device = ?", [req.body.username], (err, rows) => {
-        //
-        // })
+    app.delete('/devices_type/:device', isLoggedIn, function (req, res) {
         console.log("delete", req.params.device)
 
         connection.query("DELETE FROM devices WHERE device = ?", [req.params.device], (err, rows) => {
@@ -123,6 +120,8 @@ module.exports = function (app, passport) {
         failureFlash: true
     }));
 
+
+    //
     app.get('/dashboard', isLoggedIn, function (req, res) {
         connection.query("SELECT * FROM devices", (err, rows) => {
             if (!err) {
@@ -249,7 +248,7 @@ module.exports = function (app, passport) {
 
         connection.query("SELECT * FROM devices WHERE device = ?", [req.body.device], (err, rowss) => {
             console.log("rowss.length", rowss.length)
-            if (rowss.length < 1) {
+            if (rowss.length < 1 && req.body.device !== '') {
                 connection.query("INSERT INTO devices set ? ", defaultData, function (err, re) {
 
                     if (err) {
@@ -271,7 +270,6 @@ module.exports = function (app, passport) {
             setTimeout(() => {
                 setInterval(() => {
                     request
-                    // .get('https://dog.ceo/api/breeds/list/all')
                         .get('http://192.168.1.69:1880/ESP')
                         .then((r) => {
                             console.log("res.body", r.body);
