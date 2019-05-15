@@ -240,18 +240,18 @@ module.exports = function (app, passport) {
                 setInterval(async () => {
                     await request
                         // .get('https://dog.ceo/api/breeds/list/all')
-                        .get('http://192.168.1.4:1880/ESP')
+                        .get('http://192.168.1.69:1880/ESP')
                         .then((r) => {
                             console.log("res.body", r.body);
-                            r.body = {
-                                device: 'WemosD1',
-                                time: '50157293',
-                                user: '  duy',
-                                voltage: '493421',
-                                prob: 'Temp-27.20,Hum-72.00',
-                                status: "ON",
-                                date: getDate()
-                            };
+                            // r.body = {
+                            //     device: 'WemosD1',
+                            //     time: '50157293',
+                            //     user: '  duy',
+                            //     voltage: '493421',
+                            //     prob: 'Temp-27.20,Hum-72.00',
+                            //     status: "ON",
+                            //     date: getDate()
+                            // };
 
                             let data = {
                                 device: r.body.device,
@@ -287,18 +287,18 @@ module.exports = function (app, passport) {
                                            }
 
                                         } else {
-                                            connection.query("INSERT INTO devices set ? ", data, function (err, re) {
-
-                                                if (err) {
-                                                    console.log(err);
-                                                    return next("Mysql error, check your query");
-                                                } else {
-                                                    console.log("POST OK!");
-                                                    setTimeout(() => {
-                                                        checkStatusDevice(r.body.device, r.body.user)
-                                                    }, 31000)
-                                                }
-                                            });
+                                            // connection.query("INSERT INTO devices set ? ", data, function (err, re) {
+                                            //
+                                            //     if (err) {
+                                            //         console.log(err);
+                                            //         return next("Mysql error, check your query");
+                                            //     } else {
+                                            //         console.log("POST OK!");
+                                            //         setTimeout(() => {
+                                            //             checkStatusDevice(r.body.device, r.body.user)
+                                            //         }, 31000)
+                                            //     }
+                                            // });
                                         }
                                     } else {
                                         console.log(err)
