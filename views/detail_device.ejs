@@ -21,7 +21,7 @@
 <body>
 <div class="container">
     <div class="page-header text-center">
-        <h1>Battery Monitoring System</h1>
+        <h1>IOT System</h1>
         <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
         <a href="/item" class="btn btn-danger btn-sm">Back page</a>
     </div>
@@ -32,7 +32,6 @@
             <tr>
                 <th style="width: 50px;">No</th>
                 <th scope="col">device name</th>
-                <th scope="col">voltage</th>
                 <th scope="col">property</th>
                 <th scope="col">status</th>
                 <th scope="col">Date</th>
@@ -47,7 +46,6 @@
                 <tr>
                     <td><%= data[i].id %></td>
                     <td><%= data[i].device %></td>
-                    <td><%= data[i].voltage %></td>
                     <td><%= data[i].prob %></td>
                     <td><%= data[i].status %></td>
                     <td><%= data[i].date %></td>

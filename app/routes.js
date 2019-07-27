@@ -21,7 +21,7 @@ connection.connect((err) => {
 
 
 // var deviceName = ['WemosD1'];
-var duyDevice = [];
+var devices = [];
 var detail_device = []
 
 module.exports = function (app, passport) {
@@ -127,7 +127,7 @@ module.exports = function (app, passport) {
             if (!err) {
                 // res.send(rows)
                 console.log("aaaa", rows[rows.length - 1])
-                res.render('add_device.ejs', {
+                res.render('add.ejs', {
                     title: "RESTful Crud Example",
                     data: rows,
                     user: req.user
@@ -223,17 +223,16 @@ module.exports = function (app, passport) {
                 console.log(err)
             }
         })
-        console.log("duyDevice", duyDevice);
     });
 
     app.post('/dashboard', isLoggedIn, async function (req, res, next) {
-        let checkDevice = duyDevice.filter((item) => {
+        let checkDevice = devices.filter((item) => {
             return item == req.body.device
         })
         if (checkDevice == req.body.device) {
 
         } else {
-            duyDevice.push(req.body.device)
+            devices.push(req.body.device)
 
         }
         let defaultData = {
@@ -275,26 +274,23 @@ module.exports = function (app, passport) {
                         .get('http://192.168.1.69:1880/ESP')
                         .then((r) => {
                             console.log("res.body", r.body);
-                            // r.body = {
-                            //     device: 'WemosD1',
-                            //     time: '50157293',
-                            //     user: '  duy',
-                            //     voltage: '493421',
-                            //     prob: 'Temp-27.20,Hum-72.00',
-                            //     status: "ON",
-                            //     date: getDate()
-                            // };
-                            data = []
-
-                            data = {
-                                device: r.body.device,
-                                time: r.body.time,
-                                user: r.body.user,
-                                voltage: r.body.voltage,
-                                prob: r.body.prob,
+                            r.body = {
+                                device: 'WemosD1',
+                                time: '50157293',
+                                prob: 'Temp-27.20,HumAir-72.00, HumGR-70.00',
                                 status: "ON",
                                 date: getDate()
-                            }
+                            };
+                            data = []
+
+                            // data = {
+                            //     device: r.body.device,
+                            //     time: r.body.time,
+                            //     user: r.body.user,
+                            //     prob: r.body.prob,
+                            //     status: "ON",
+                            //     date: getDate()
+                            // }
 
                             console.log('data', req.body.device, req.body.username, r.body.user, r.body.device)
 

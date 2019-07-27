@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS `devices` (
   `device` varchar(100),
   `time` varchar(100),
   `user` varchar(100),
-  `voltage` varchar(100),
   `prob` varchar(100),
   `status` varchar(100),
   `date` varchar(100),
@@ -35,5 +34,5 @@ CREATE TABLE IF NOT EXISTS `devices` (
 -- Dumping data for table `devices`
 --
 
--- INSERT INTO `devices` (`id`, `device`, `time`, `voltage`, prob, status, `date`) VALUES
--- (1, 'ESP32', 56380, '2', 'REDLED-on,SERVO-off', 'ON', "2019-5-12 11:12:40");
+-- INSERT INTO `devices` (`id`, `device`, `time`, prob, status, `date`) VALUES
+-- (1, 'ESP32', 56380, 'REDLED-on,SERVO-off', 'ON', "2019-7-12 11:12:40");
