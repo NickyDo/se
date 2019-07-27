@@ -31,5 +31,7 @@ app.use(flash());
 
 require('./app/routes.js')(app, passport);
 
-app.listen(port);
-console.log("Port: " + port);
+const server = app.listen(3000,()=>{
+ console.log("The app is running on port: 3000")
+});
+module.exports = server;

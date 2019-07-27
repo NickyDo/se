@@ -1,7 +1,13 @@
-vao file database.js trong thu muc config r sua ten db va mat khau trong do
-....
-sau do copy tat ca trong file test_db.sql vao trong cho db cua workbench r execute no
+#Greenhouse system
 
-chay npm install
+### Install
+```
+$ npm i
+```
 
-cuoi cung chay lenh node server.js
+### Running the app
+
+```$xslt
+$ npm test
+```
+http://localhost:3000
